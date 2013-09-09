@@ -2,6 +2,22 @@ extends layout
 
 block content
     h1= 'Use arrow keys to move the tank (hold shift for "turbo")'
-    canvas(id="tank-canvas")
+    h2= 'Up, Down, Left, Right, Space, P, W'
+    h3= 'This game might bust, don\'t worry it\'s still beta'
+    canvas(id="tank-canvas",style="border:1px solid #000")
+    script(type='text/javascript', src='javascripts/ext/html5preloader.js')
     script(type='text/javascript', src='javascripts/jquery-2.0.3.js')
+    
+
+
+    script(type='text/javascript', src='javascripts/engine/engine.js')
+    script(type='text/javascript', src='javascripts/engine/lib-keys.js')
+    script(type='text/javascript', src='javascripts/engine/lib-image.js')
+    script(type='text/javascript', src='javascripts/engine/lib-sprite.js')
+    script(type='text/javascript', src='javascripts/engine/lib-canvas.js')
+
+    script(type='text/javascript', src='javascripts/tanks/tanks.js')
+    script(type='text/javascript', src='javascripts/tanks/lib-sounds.js')
+    script(type='text/javascript', src='javascripts/tanks/lib-spriteDefinition.js')
+    
     script(type='text/javascript', src='javascripts/canvas-game.js')
