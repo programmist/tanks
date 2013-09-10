@@ -23,7 +23,7 @@ app.use(express.session());
 app.use(app.router);
 app.use(require('less-middleware')({ src: __dirname + '/public' }));
 app.use(express.static(path.join(__dirname, 'public')));
-
+app.use(express.directory(__dirname + '/public'));
 // development only
 if ('development' == app.get('env')) {
     app.use(express.errorHandler());
@@ -31,6 +31,7 @@ if ('development' == app.get('env')) {
 
 app.get('/', routes.index);
 app.get('/users', user.list);
+//app.get('/images', images.list);
 
 http.createServer(app).listen(app.get('port'), function () {
     console.log('Express server listening on port ' + app.get('port'));
