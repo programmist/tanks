@@ -12,7 +12,7 @@ Tanks.Sounds = new function(){
         soundArray.push(obj[key]);
       }
     }
-    alert("This game might crash, but no worries, it's not optimized yet, nor near ready!");
+//    alert("This game might crash, but no worries, it's not optimized yet, nor near ready!");
     self.loader = html5Preloader.apply(this, soundArray);
     self.loader.on('finish', callback);
   }

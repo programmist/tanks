@@ -1,3 +1,5 @@
+// https://github.com/jussi-kalliokoski/html5Preloader.js
+
 var html5Preloader = (function () {
 
 var XHR = typeof XMLHttpRequest === 'undefined' ? function () { // IE FIX

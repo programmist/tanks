@@ -19,7 +19,7 @@ Engine.Canvas = new function(){
     Engine.Canvas.ctx.clearRect(0, 0, Engine.Canvas.width, Engine.Canvas.width);
   }
 
-  // Render all sprites
+  // Render all sprites  -  http://i.qkme.me/3vqnm6.jpg
   self.render = function(){
       self.clearCanvas();
       for(_index in Engine.Sprite.collection){

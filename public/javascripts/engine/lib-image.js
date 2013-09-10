@@ -6,12 +6,24 @@ Engine.Image = new function(){
     self.create = function(name,src){
         var item = {
             "name": name,
-            "image": new Image(),
+            "image": self.newImage(),
             "loaded": false
         };
         item.image.src = src;
         self.collection.push(item);
     };
+
+    self.newImage = function() {
+        img = new Image();
+        img.onload = function(){
+            img.loaded = true;
+        }
+        img.onerror = function(){
+            img.loaded = true;
+            alert("Image does not exist: \r\n " + img.src);
+        }
+        return img;
+    }
 
     // Gets the image by name
     self.get = function(name){
@@ -23,38 +35,13 @@ Engine.Image = new function(){
     };
 
     // Preloads images that belong in the collection
-    self.preLoad = function(images, callback){
+    self.preLoad = function(images){
         var allImagesLoaded = true;
         if(images){
             for(_index in images){
                 var obj = images[_index];
                 for(_key in obj) self.create(_key, obj[_key]);
             }
-            return self.preLoad(false, callback);
-        }
-        for(_index in self.collection){
-            var obj = self.collection[_index];
-            if(obj.loaded == false){
-                allImagesLoaded = false;
-                if(obj.image.onload == null){
-                    self.loadImage(obj, callback);
-                }
-            }
-        }
-        if(allImagesLoaded){ 
-            return callback.call();
-        }
-    }
-
-    self.loadImage = function(obj, callback){
-        obj.image.onload = function(){
-            obj.loaded = true;
-            self.preLoad(false, callback);
-        }
-        obj.image.onerror = function(){
-            obj.loaded = true;
-            alert("Image does not exist: \r\n " + obj.image.src);
-            self.preLoad(false, callback);
         }
     }
 }

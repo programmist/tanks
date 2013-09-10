@@ -27,13 +27,16 @@ Tanks = new function(){
         "crash":            "sounds/crash.mp3"
     }];
 
-    // Init (grab images and start the game)
-    self.init = function(){
-        Engine.Image.preLoad(Tanks.images, function(){
-            Tanks.Sounds.loadSounds(Tanks.sounds, function(){
-                Tanks.reset();
-            })
+    self.init = function() {
+        var init = $.Deferred();
+        init.then(function() {
+            Engine.Image.preLoad(Tanks.images);
+        }).then(function() {
+            Tanks.Sounds.loadSounds(Tanks.sounds);
+        }).then(function() {
+            Tanks.reset();
         });
+        init.resolve();
     };
 
     // Reset Game (init canvas, start the loop)
