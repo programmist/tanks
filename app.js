@@ -27,6 +27,6 @@ var connectionCount = 1;
 io.sockets.on('connection', function (socket) {
   socket.emit("connId", {"id": connectionCount++});
      socket.on("move", function(data){
-       io.sockets.emit(data);
+       io.sockets.broadcast.emit(data);
      })
 });

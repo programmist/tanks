@@ -29,7 +29,8 @@ Tanks = new function(){
     }];
 
     self.init = function() {
-      Engine.Sockets.connect("node-test-box-24433.use1.actionbox.io:3000");
+//      Engine.Sockets.connect("node-test-box-24433.use1.actionbox.io:3000");
+      Engine.Sockets.connect("192.168.43.139:3000");
       Engine.Sockets.addListener("connId", function(data){
         self.connectionID = data.id;
         var init = $.Deferred();
@@ -65,7 +66,7 @@ Tanks = new function(){
     // Create the sprites for this game
     self.createSprites = function(){
         Engine.Sprite.reset();
-        new Tanks.SpriteDefinition.player1();
+        new Player(Tanks.connectionID);
     };
   
     // Main Game Loop
