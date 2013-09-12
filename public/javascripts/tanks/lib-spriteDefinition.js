@@ -2,6 +2,15 @@
 
 Tanks.SpriteDefinition = new function(){
   var self = this;
+  
+  self.listener_move = function(sprite){
+    Engine.Sockets.emit("move", {
+        connectionID: Tanks.connectionID,
+        id: sprite.id,
+        x: sprite.x,
+        y: sprite.y
+      });
+  }  
 
   /*
    * Player 1 Definitions
@@ -12,6 +21,7 @@ Tanks.SpriteDefinition = new function(){
     obj.playerSpeed = obj.playerDefaultSpeed;
     obj.playerTurboSpeed = 10;
     obj.fireLauncher = 0;
+    obj.connectionID = Tanks.connectionID;
 
     // Create the sprite and definition
     var sprite = window.Engine.Sprite.create();
@@ -65,6 +75,8 @@ Tanks.SpriteDefinition = new function(){
       sprite.ydir = 0;
       sprite.x-= obj.playerSpeed;
       if(Engine.Sprite.collisionCheckAll(sprite)) sprite.x+= obj.playerSpeed;
+      
+     self.listener_move(sprite);
     }
     obj.moveRight = function(){
       Engine.Sprite.useImage("player1_right", sprite);
@@ -72,6 +84,8 @@ Tanks.SpriteDefinition = new function(){
       sprite.ydir = 0;
       sprite.x+= obj.playerSpeed;
       if(Engine.Sprite.collisionCheckAll(sprite)) sprite.x-= obj.playerSpeed;
+      
+      self.listener_move(sprite);
     }
     obj.moveUp = function(){
       Engine.Sprite.useImage("player1_up", sprite);
@@ -79,6 +93,8 @@ Tanks.SpriteDefinition = new function(){
       sprite.xdir = 0;
       sprite.y-= obj.playerSpeed;
       if(Engine.Sprite.collisionCheckAll(sprite)) sprite.y+= obj.playerSpeed;
+      
+      self.listener_move(sprite);
     }
     obj.moveDown = function(){
       Engine.Sprite.useImage("player1_down", sprite);
@@ -86,6 +102,8 @@ Tanks.SpriteDefinition = new function(){
       sprite.xdir = 0;
       sprite.y+= obj.playerSpeed;
       if(Engine.Sprite.collisionCheckAll(sprite)) sprite.y-= obj.playerSpeed;
+      
+      self.listener_move(sprite);
     }
 
     return sprite;

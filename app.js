@@ -23,9 +23,10 @@ server.listen(app.get('port'), function () {
     console.log('Express server listening on port ' + app.get('port'));
 });
 
+var connectionCount = 1;
 io.sockets.on('connection', function (socket) {
-    socket.emit('news', { hello: 'world' });
-    socket.on('my other event', function (data) {
-        console.log(data);
-    });
+  socket.emit("connId", {"id": connectionCount++});
+     socket.on("move", function(data){
+       io.sockets.emit(data);
+     })
 });

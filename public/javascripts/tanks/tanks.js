@@ -1,5 +1,6 @@
 Tanks = new function(){
     var self = this;
+    self.connectionID = 0;
     self.canvasElement = $("#tank-canvas");
     self.width = 800;
     self.height = 500;
@@ -28,16 +29,30 @@ Tanks = new function(){
     }];
 
     self.init = function() {
+      Engine.Sockets.connect("node-test-box-24433.use1.actionbox.io:3000");
+      Engine.Sockets.addListener("connId", function(data){
+        self.connectionID = data.id;
         var init = $.Deferred();
-        init.then(function() {
-            Engine.Image.preLoad(Tanks.images);
+        init.then(function() { 
+          Engine.Image.preLoad(Tanks.images);
         }).then(function() {
-            Tanks.Sounds.loadSounds(Tanks.sounds);
+          Tanks.Sounds.loadSounds(Tanks.sounds);
         }).then(function() {
-            Tanks.reset();
+          Tanks.reset();
+          Tanks.addListeners();
         });
-        init.resolve();
+        init.resolve();    
+      });
     };
+  
+    self.addListeners = function(){
+      Engine.Sockets.addListener("move", function(sprite){
+        if(sprite.connectionID == self.connectionID) return;
+        var _sprite = Engine.Sprite.getByID(sprite.id);
+        _sprite.x = sprite.x;
+        _sprite.y = sprite.y;
+      });
+    }
 
     // Reset Game (init canvas, start the loop)
     self.reset = function(){
@@ -46,16 +61,16 @@ Tanks = new function(){
         Engine.Canvas.init(self.canvasElement, self.width, self.height);
         Engine.Canvas.start(self.fps);
     };
-
+  
     // Create the sprites for this game
     self.createSprites = function(){
         Engine.Sprite.reset();
         new Tanks.SpriteDefinition.player1();
-        new Tanks.SpriteDefinition.player2();
     };
-
+  
     // Main Game Loop
     self.gameLoop = function(){
         Engine.Canvas.render();
     };
+  
 }

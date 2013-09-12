@@ -7,6 +7,15 @@ Engine.Sprite = new function(){
     self.reset = function(){
         self.collection = [];
     };
+  
+    // Gets a sprite by its id
+    self.getByID = function(id){
+      for(_index in self.collection){
+            var obj = self.collection[_index];
+            if(obj.id == id) return obj;
+        }
+        return false;
+    }
 
     // Gets a sprite by its name
     self.get = function(name){
