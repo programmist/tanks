@@ -30,6 +30,7 @@ Tanks = new function(){
 
     self.init = function() {
       Engine.Sockets.connect("node-test-box-24433.use1.actionbox.io:3000");
+//        Engine.Sockets.connect("127.0.0.1:3000");
       Engine.Sockets.addListener("connId", function(data){
         self.connectionID = data.id;
         var init = $.Deferred();
