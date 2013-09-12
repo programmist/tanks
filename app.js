@@ -27,6 +27,7 @@ var connectionCount = 1;
 io.sockets.on('connection', function (socket) {
   socket.emit("connId", {"id": connectionCount++});
      socket.on("move", function(data){
-       io.sockets.broadcast.emit(data);
+       console.log("Received from tank: " + JSON.stringify(data));
+       socket.broadcast.emit(data);
      })
 });
