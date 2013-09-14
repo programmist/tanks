@@ -16,6 +16,52 @@ function Sprite(id) {
     Engine.Sprite.collection.push(self);  // refactor (more OO)
 }
 
+Bullet.prototype = new Sprite();
+function Bullet(startSprite) {
+    var self = this;
+
+    self.type = "fire";
+    self.img = Engine.Image.get("player1_fire");
+    self.x = startSprite.x;
+    self.y = startSprite.y;
+
+    self.spriteOriginatedFrom = $.extend({}, startSprite);
+    self.fireSpeed = 20;
+    self.xdir = 0;
+    self.ydir = 0;
+    self.x = self.spriteOriginatedFrom.x + self.spriteOriginatedFrom.xdir;
+    self.y = self.spriteOriginatedFrom.y + self.spriteOriginatedFrom.ydir;
+    if (self.spriteOriginatedFrom.xdir < 0) self.xdir = -self.fireSpeed;
+    if (self.spriteOriginatedFrom.xdir > 0) self.xdir = self.fireSpeed;
+    if (self.spriteOriginatedFrom.ydir < 0) self.ydir = -self.fireSpeed;
+    if (self.spriteOriginatedFrom.ydir > 0) self.ydir = self.fireSpeed;
+    self.definition = self;
+
+    // Key Definitions
+    self.run = function () {
+        console.log("fire!");
+        self.x += self.xdir;
+        self.y += self.ydir;
+        if (self.x + self.width < 0) self.flag = -1;
+        if (self.y + self.height < 0) self.flag = -1;
+        if (self.x > Tanks.width) self.flag = -1;
+        if (self.y - self.height > Tanks.height) self.flag = -1;
+
+        // Detect Collisions
+        var checkList = Engine.Sprite.getSpritesWithType(["tank", "wall"]);
+        var ignoreList = [self.spriteOriginatedFrom];
+        var collision = Engine.Sprite.collisionCheckSelected(self, checkList, ignoreList);
+        if (collision) {
+            if (collision.type == "wall") {
+                collision.flag = -1;
+            }
+            Tanks.Sounds.playSound("hitTank");
+            self.flag = -1;
+        }
+    };
+}
+
+
 function Player(id) {
     var self = this;
     self.id = id;
@@ -39,25 +85,113 @@ function Player(id) {
         if (Engine.Keys.pressing("spacebar")) self.fire();
         if (Engine.Keys.pressing("w")) self.wall();
         if (Engine.Keys.pressing("p")) self.pong();
-    }
+    };
 
-    // Movement Routines
-    self.pong = function () {
-        self.fireLauncher++;
-        if (self.fireLauncher % 10 == 0) {
-            Tanks.Sounds.playSound("pongFire");
-            self.pong();
-        }
-    }
     self.wall = function () {
         self.fireLauncher++;
         if (self.fireLauncher % 10 == 0) {
             self.wall();
         }
     }
-//    self.fire = function () {
-//
-//    }
+    Player.prototype.fire = function () {
+        var self = this;
+        self.fireLauncher++;
+        if (self.fireLauncher % 5 == 0) {
+            Tanks.Sounds.playSound("player1shoot");
+
+            // Create the sprite and definition
+            var bullet = new Bullet(self.sprite);
+            bullet.type = "fire";
+            bullet.img = Engine.Image.get("player1_fire");
+            bullet.x = self.sprite.x;
+            bullet.y = self.sprite.y;
+
+            bullet.spriteOriginatedFrom = $.extend({}, self.sprite);
+            bullet.fireSpeed = 20;
+            bullet.xdir = 0;
+            bullet.ydir = 0;
+            bullet.x = bullet.spriteOriginatedFrom.x + bullet.spriteOriginatedFrom.xdir;
+            bullet.y = bullet.spriteOriginatedFrom.y + bullet.spriteOriginatedFrom.ydir;
+            if (bullet.spriteOriginatedFrom.xdir < 0) bullet.xdir = -bullet.fireSpeed;
+            if (bullet.spriteOriginatedFrom.xdir > 0) bullet.xdir = bullet.fireSpeed;
+            if (bullet.spriteOriginatedFrom.ydir < 0) bullet.ydir = -bullet.fireSpeed;
+            if (bullet.spriteOriginatedFrom.ydir > 0) bullet.ydir = bullet.fireSpeed;
+            bullet.definition = bullet;
+
+
+            // Key Definitions
+            bullet.run = function () {
+                console.log("fire!");
+                bullet.x += bullet.xdir;
+                bullet.y += bullet.ydir;
+                if (bullet.x + bullet.width < 0) bullet.flag = -1;
+                if (bullet.y + bullet.height < 0) bullet.flag = -1;
+                if (bullet.x > Tanks.width) bullet.flag = -1;
+                if (bullet.y - bullet.height > Tanks.height) bullet.flag = -1;
+
+                // Detect Collisions
+                var checkList = Engine.Sprite.getSpritesWithType(["tank", "wall"]);
+                var ignoreList = [bullet.spriteOriginatedFrom];
+                var collision = Engine.Sprite.collisionCheckSelected(bullet, checkList, ignoreList);
+                if (collision) {
+                    if (collision.type == "wall") {
+                        collision.flag = -1;
+                    }
+                    Tanks.Sounds.playSound("hitTank");
+                    bullet.flag = -1;
+                }
+            };
+            return bullet;
+        }
+    };
+    Player.prototype.pong = function () {
+        self.fireLauncher++;
+        if (self.fireLauncher % 10 == 0) {
+            Tanks.Sounds.playSound("pongFire");
+            var self = this;
+            self.spriteOriginatedFrom = $.extend({}, self.sprite);
+            self.fireSpeed = 10;
+            self.x = self.spriteOriginatedFrom.x + self.spriteOriginatedFrom.width;
+            self.y = self.spriteOriginatedFrom.y + self.spriteOriginatedFrom.height;
+            self.xdir = 1 * self.fireSpeed;
+            self.ydir = 1 * self.fireSpeed;
+            if (self.spriteOriginatedFrom.xdir < 0) self.xdir = -1 * self.fireSpeed;
+            if (self.spriteOriginatedFrom.xdir > 0) self.xdir = 1 * self.fireSpeed;
+            if (self.spriteOriginatedFrom.ydir < 0) self.ydir = -1 * self.fireSpeed;
+            if (self.spriteOriginatedFrom.ydir > 0) self.ydir = 1 * self.fireSpeed;
+
+            // Create the sprite and definition
+            var sprite = new Sprite();
+            sprite.type = "fire";
+            sprite.definition = this;
+            sprite.img = Engine.Image.get("player1_fire");
+            sprite.x = self.x;
+            sprite.y = self.y;
+
+            // Key Definitions
+            self.run = function () {
+                sprite.x += self.xdir;
+                sprite.y += self.ydir;
+                if (sprite.x >= Tanks.width) self.xdir = -self.xdir;
+                if (sprite.x < 0) self.xdir = -self.xdir;
+                if (sprite.y >= Tanks.height - sprite.height) self.ydir = -self.ydir;
+                if (sprite.y < 0) self.ydir = -self.ydir;
+
+                // Detect Collisions
+                var checkList = Engine.Sprite.getSpritesWithType(["tank", "wall"]);
+                var ignoreList = [self.spriteOriginatedFrom];
+                var collision = Engine.Sprite.collisionCheckSelected(sprite, checkList, ignoreList);
+                if (collision) {
+                    if (collision.type == "wall") {
+                        collision.flag = -1;
+                    }
+                    sprite.flag = -1;
+                }
+
+            };
+            return sprite;
+        }
+    };
     self.turbo = function () {
         self.playerSpeed = self.playerTurboSpeed;
     }
@@ -113,108 +247,12 @@ Player.prototype.move = function () {
 /*
  * Fire Definitions
  */
-Player.prototype.fire = function () {
-    var self = this;
-    self.fireLauncher++;
-    if (self.fireLauncher % 3 == 0) {
-        Tanks.Sounds.playSound("player1shoot");
 
-        // Create the sprite and definition
-        var bullet = new Sprite();
-        bullet.type = "fire";
-        bullet.img = Engine.Image.get("player1_fire");
-        bullet.x = self.sprite.x;
-        bullet.y = self.sprite.y;
-
-        bullet.spriteOriginatedFrom = $.extend({}, self.sprite);
-        bullet.fireSpeed = 20;
-        bullet.xdir = 0;
-        bullet.ydir = 0;
-        bullet.x = bullet.spriteOriginatedFrom.x + bullet.spriteOriginatedFrom.xdir;
-        bullet.y = bullet.spriteOriginatedFrom.y + bullet.spriteOriginatedFrom.ydir;
-        if (bullet.spriteOriginatedFrom.xdir < 0) bullet.xdir = -bullet.fireSpeed;
-        if (bullet.spriteOriginatedFrom.xdir > 0) bullet.xdir = bullet.fireSpeed;
-        if (bullet.spriteOriginatedFrom.ydir < 0) bullet.ydir = -bullet.fireSpeed;
-        if (bullet.spriteOriginatedFrom.ydir > 0) bullet.ydir = bullet.fireSpeed;
-        bullet.definition = bullet;
-
-
-// Key Definitions
-        bullet.run = function () {
-            console.log("fire!");
-            bullet.x += bullet.xdir;
-            bullet.y += bullet.ydir;
-            if (bullet.x + bullet.width < 0) bullet.flag = -1;
-            if (bullet.y + bullet.height < 0) bullet.flag = -1;
-            if (bullet.x > Tanks.width) bullet.flag = -1;
-            if (bullet.y - bullet.height > Tanks.height) bullet.flag = -1;
-
-            // Detect Collisions
-            var checkList = Engine.Sprite.getSpritesWithType(["tank", "wall"]);
-            var ignoreList = [bullet.spriteOriginatedFrom];
-            var collision = Engine.Sprite.collisionCheckSelected(bullet, checkList, ignoreList);
-            if (collision) {
-                if (collision.type == "wall") {
-                    collision.flag = -1;
-                }
-                Tanks.Sounds.playSound("hitTank");
-                bullet.flag = -1;
-            }
-        };
-
-        return bullet;
-    }
-};
 
 /*
  * Fire Pong Definition
  */
-Player.prototype.pong = function () {
-    var self = this;
-    self.spriteOriginatedFrom = $.extend({}, self.sprite);
-    self.fireSpeed = 10;
-    self.x = self.spriteOriginatedFrom.x + self.spriteOriginatedFrom.width;
-    self.y = self.spriteOriginatedFrom.y + self.spriteOriginatedFrom.height;
-    self.xdir = 1 * self.fireSpeed;
-    self.ydir = 1 * self.fireSpeed;
-    if (self.spriteOriginatedFrom.xdir < 0) self.xdir = -1 * self.fireSpeed;
-    if (self.spriteOriginatedFrom.xdir > 0) self.xdir = 1 * self.fireSpeed;
-    if (self.spriteOriginatedFrom.ydir < 0) self.ydir = -1 * self.fireSpeed;
-    if (self.spriteOriginatedFrom.ydir > 0) self.ydir = 1 * self.fireSpeed;
 
-// Create the sprite and definition
-    var sprite = new Sprite();
-    sprite.type = "fire";
-    sprite.definition = this;
-    sprite.img = Engine.Image.get("player1_fire");
-    sprite.x = self.x;
-    sprite.y = self.y;
-
-// Key Definitions
-    self.run = function () {
-        sprite.x += self.xdir;
-        sprite.y += self.ydir;
-        if (sprite.x >= Tanks.width) self.xdir = -self.xdir;
-        if (sprite.x < 0) self.xdir = -self.xdir;
-        if (sprite.y >= Tanks.height - sprite.height) self.ydir = -self.ydir;
-        if (sprite.y < 0) self.ydir = -self.ydir;
-
-        // Detect Collisions
-        var checkList = Engine.Sprite.getSpritesWithType(["tank", "wall"]);
-        var ignoreList = [self.spriteOriginatedFrom];
-        var collision = Engine.Sprite.collisionCheckSelected(sprite, checkList, ignoreList);
-        if (collision) {
-            if (collision.type == "wall") {
-                collision.flag = -1;
-            }
-            sprite.flag = -1;
-        }
-
-    }
-
-    return sprite;
-
-};
 
 /*
  * WallBlock(test) Definitions
