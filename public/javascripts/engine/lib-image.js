@@ -17,13 +17,13 @@ Engine.Image = new function(){
         img = new Image();
         img.onload = function(){
             img.loaded = true;
-        }
+        };
         img.onerror = function(){
             img.loaded = true;
             alert("Image does not exist: \r\n " + img.src);
-        }
+        };
         return img;
-    }
+    };
 
     // Gets the image by name
     self.get = function(name){
@@ -44,4 +44,4 @@ Engine.Image = new function(){
             }
         }
     }
-}
+};

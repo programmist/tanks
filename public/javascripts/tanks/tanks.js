@@ -1,5 +1,7 @@
 Tanks = new function(){
     var self = this;
+    self.localPlayer = null;
+    self.opponents = [];
     self.connectionID = 0;
     self.canvasElement = $("#tank-canvas");
     self.width = 800;
@@ -45,33 +47,48 @@ Tanks = new function(){
         init.resolve();    
       });
     };
-  
-    self.addListeners = function(){
-      Engine.Sockets.addListener("move", function(sprite){
-        if(sprite.connectionID == self.connectionID) return;
-        var _sprite = Engine.Sprite.getByID(sprite.id);
-        _sprite.x = sprite.x;
-        _sprite.y = sprite.y;
-      });
-    }
 
     // Reset Game (init canvas, start the loop)
     self.reset = function(){
         self.createSprites();
-        Engine.Canvas.loop = self.gameLoop;
         Engine.Canvas.init(self.canvasElement, self.width, self.height);
         Engine.Canvas.start(self.fps);
+    };
+
+    self.addListeners = function(){
+        Engine.Sockets.addListener("player-enter", function(sprite){
+            opp = new Player(sprite.id, "player2");
+            opp.sprite.x = sprite.x;
+            opp.sprite.y = sprite.y;
+            self.opponents[sprite.id] = opp;
+        });
+
+        Engine.Sockets.addListener("player-leave", function(sprite){
+            opp = self.opponents[sprite.id];
+            opp.destroy();
+            delete self.opponents[sprite.id];
+        });
+
+        Engine.Sockets.addListener("move", function(sprite){
+            var _sprite = Engine.Sprite.getByID(sprite.id);
+            _sprite.x = sprite.x;
+            _sprite.y = sprite.y;
+        });
+
+        Engine.Sockets.addListener("fire", function(sprite){
+            var _sprite = Engine.Sprite.getByID(sprite.id);
+            /*
+             *  We need another level of abstraction.  Rather than moving sprites
+             *  we should be moving players and delegating the sprite handling to them.
+             * Otherwise we're stuck in this position where we need to tell the tank to fire,
+             * but have no reference to it.
+             */
+        });
     };
   
     // Create the sprites for this game
     self.createSprites = function(){
         Engine.Sprite.reset();
-        new Player(Tanks.connectionID);
+        self.localPlayer = new Player(Tanks.connectionID, "player1");
     };
-  
-    // Main Game Loop
-    self.gameLoop = function(){
-        Engine.Canvas.render();
-    };
-  
-}
+};

@@ -116,28 +116,6 @@ Engine.Sprite = new function(){
         return false;
     }
 
-    // Create a new Sprite
-    self.create = function(obj){
-        self.counter++;
-        var info = {
-            id: self.counter,
-            name: "",
-            height: 0,
-            width: 0,
-            x: 0,
-            y: 0,
-            xdir: 1,
-            ydir: 1,
-            img: false,
-            flag: 0,
-            type: "default",
-            definition: false
-        };
-        info = $.extend(info,obj);
-        self.collection.push(info);
-        return self.collection[self.collection.length-1];
-    };
-
     // Inhert properties from image
     self.useImage = function(img, sprite){
         var image = Engine.Image.get(img);
