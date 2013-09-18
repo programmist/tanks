@@ -57,6 +57,7 @@ Tanks = new function(){
 
     self.addListeners = function(){
         Engine.Sockets.addListener("player-enter", function(event){
+            if (self.connectionID == event.id) return;
             opp = new Player(event.id, "player2");
             opp.sprite.x = event.x;
             opp.sprite.y = event.y;
@@ -64,19 +65,22 @@ Tanks = new function(){
         });
 
         Engine.Sockets.addListener("player-leave", function(event){
+            if (self.connectionID == event.id) return;
             opp = self.opponents[event.id];
             opp.destroy();
             delete self.opponents[event.id];
         });
 
         Engine.Sockets.addListener("move", function(event){
+            if (self.connectionID == event.id) return;
             opp = self.opponents[event.id];
             opp.sprite.x = event.x;
             opp.sprite.y = event.y;
-            opp.move(event.command);
+            opp.move(event.cmd);
         });
 
         Engine.Sockets.addListener("fire", function(event){
+            if (self.connectionID == event.id) return;
             opp = self.opponents[event.id];
             opp.fire();
         });
@@ -86,5 +90,11 @@ Tanks = new function(){
     self.createSprites = function(){
         Engine.Sprite.reset();
         self.localPlayer = new Player(Tanks.connectionID, "player1");
+
+        Engine.Sockets.emit("player-enter", {
+            id: self.localPlayer.id,
+            x: self.localPlayer.sprite.x,
+            y: self.localPlayer.sprite.y
+        });
     };
 };

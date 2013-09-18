@@ -25,9 +25,24 @@ server.listen(app.get('port'), function () {
 
 var connectionCount = 1;
 io.sockets.on('connection', function (socket) {
-  socket.emit("connId", {"id": connectionCount++});
-     socket.on("move", function(data){
-       console.log("Received from tank: " + JSON.stringify(data));
-       socket.broadcast.emit(data);
-     })
+    socket.emit("connId", {"id": connectionCount++});
+    socket.on("move", function(data){
+        console.log("MOVE - Received from tank: " + JSON.stringify(data));
+        socket.broadcast.emit("move", data);
+    });
+
+    socket.on("fire", function(data){
+        console.log("FIRE - Received from tank: " + JSON.stringify(data));
+        socket.broadcast.emit("fire",data);
+    });
+
+    socket.on("player-enter", function(data){
+        console.log("NEW PLAYER - Received from tank: " + JSON.stringify(data));
+        socket.broadcast.emit("player-enter",data);
+    });
+
+    socket.on("player-leave", function(data){
+        console.log("PLAYER " + data.id + " Leaving the game: " + JSON.stringify(data));
+        socket.broadcast.emit("player-leave",data);
+    });
 });

@@ -80,17 +80,6 @@ function Player(id, imageId) {
     self.sprite.definition = this;
     self.sprite.img = window.Engine.Image.get(self.imgId+"_up");
 
-    self.run = function () {
-        if (Engine.Keys.pressing("up")) self.move("up");
-        if (Engine.Keys.pressing("down")) self.move("down");
-        if (Engine.Keys.pressing("left")) self.move("left");
-        if (Engine.Keys.pressing("right")) self.move("right");
-        if (Engine.Keys.pressing("shift")) self.turbo();
-        if (Engine.Keys.depressing("shift")) self.noTurbo();
-        if (Engine.Keys.pressing("spacebar")) self.fire();
-        if (Engine.Keys.pressing("w")) self.wall();
-    };
-
     self.wall = function () {
         self.fireLauncher++;
         if (self.fireLauncher % 10 == 0) {
@@ -107,6 +96,11 @@ function Player(id, imageId) {
             var bullet = new Bullet(self.sprite);
             return bullet;
         }
+        Engine.Sockets.emit("fire", {
+            id: self.sprite.id,
+            x: self.sprite.x,
+            y: self.sprite.y
+        });
     };
     self.turbo = function () {
         self.playerSpeed = self.playerTurboSpeed;
@@ -115,6 +109,19 @@ function Player(id, imageId) {
         self.playerSpeed = self.playerDefaultSpeed;
     };
 }
+
+Player.prototype.run = function () {
+    var self = this;
+    if (Engine.Keys.pressing("up")) self.move("up");
+    if (Engine.Keys.pressing("down")) self.move("down");
+    if (Engine.Keys.pressing("left")) self.move("left");
+    if (Engine.Keys.pressing("right")) self.move("right");
+    if (Engine.Keys.pressing("shift")) self.turbo();
+    if (Engine.Keys.depressing("shift")) self.noTurbo();
+    if (Engine.Keys.pressing("spacebar")) self.fire();
+    if (Engine.Keys.pressing("w")) self.wall();
+};
+
 Player.prototype.move = function (direction) {
     var self = this;
     Engine.Sprite.useImage(self.imgId+"_"+ direction, self.sprite);
@@ -134,21 +141,22 @@ Player.prototype.move = function (direction) {
             xmod = 1;
             break;
     }
-    self.sprite.ydir = ydir * self.playerSpeed;
-    self.sprite.xdir = xdir * self.playerSpeed;
+    self.sprite.ydir = ymod * self.playerSpeed;
+    self.sprite.xdir = xmod * self.playerSpeed;
 
     if(xmod != 0) {
-        if (Engine.Sprite.collisionCheckAll(self.sprite)) self.sprite.x -= xdir * self.playerSpeed;
-        self.sprite.x += xdir * self.playerSpeed;
+        if (Engine.Sprite.collisionCheckAll(self.sprite)) self.sprite.x -= xmod * self.playerSpeed;
+        self.sprite.x += xmod * self.playerSpeed;
     } else if (ymod != 0) {
-        self.sprite.y += ydir * self.playerSpeed;
-        if (Engine.Sprite.collisionCheckAll(self.sprite)) self.sprite.y -= ydir * self.playerSpeed;
+        self.sprite.y += ymod * self.playerSpeed;
+        if (Engine.Sprite.collisionCheckAll(self.sprite)) self.sprite.y -= ymod * self.playerSpeed;
     }
 
     Engine.Sockets.emit("move", {
         id: self.sprite.id,
         x: self.sprite.x,
-        y: self.sprite.y
+        y: self.sprite.y,
+        cmd: direction
     });
 };
 
@@ -179,4 +187,13 @@ Player.prototype.wall = function (spriteTriggeredFrom) {
 
 Player.prototype.destroy = function() {
     self.sprite.destroy();
+};
+
+Opponent.prototype = new Player();
+Opponent.prototype.constructor = Opponent;
+function Opponent(id, imageId) {
+    Player.call(this, id, imageId);
 }
+Opponent.prototype.run = function() {
+
+};
