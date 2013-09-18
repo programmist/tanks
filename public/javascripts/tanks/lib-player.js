@@ -17,7 +17,9 @@ function Sprite(id) {
 }
 
 Bullet.prototype = new Sprite();
+Bullet.prototype.constructor = Bullet;
 function Bullet(startSprite) {
+    Sprite.call(this, null);
     var self = this;
 
     self.type = "fire";
@@ -101,46 +103,6 @@ function Player(id) {
 
             // Create the sprite and definition
             var bullet = new Bullet(self.sprite);
-            bullet.type = "fire";
-            bullet.img = Engine.Image.get("player1_fire");
-            bullet.x = self.sprite.x;
-            bullet.y = self.sprite.y;
-
-            bullet.spriteOriginatedFrom = $.extend({}, self.sprite);
-            bullet.fireSpeed = 20;
-            bullet.xdir = 0;
-            bullet.ydir = 0;
-            bullet.x = bullet.spriteOriginatedFrom.x + bullet.spriteOriginatedFrom.xdir;
-            bullet.y = bullet.spriteOriginatedFrom.y + bullet.spriteOriginatedFrom.ydir;
-            if (bullet.spriteOriginatedFrom.xdir < 0) bullet.xdir = -bullet.fireSpeed;
-            if (bullet.spriteOriginatedFrom.xdir > 0) bullet.xdir = bullet.fireSpeed;
-            if (bullet.spriteOriginatedFrom.ydir < 0) bullet.ydir = -bullet.fireSpeed;
-            if (bullet.spriteOriginatedFrom.ydir > 0) bullet.ydir = bullet.fireSpeed;
-            bullet.definition = bullet;
-
-
-            // Key Definitions
-            bullet.run = function () {
-                console.log("fire!");
-                bullet.x += bullet.xdir;
-                bullet.y += bullet.ydir;
-                if (bullet.x + bullet.width < 0) bullet.flag = -1;
-                if (bullet.y + bullet.height < 0) bullet.flag = -1;
-                if (bullet.x > Tanks.width) bullet.flag = -1;
-                if (bullet.y - bullet.height > Tanks.height) bullet.flag = -1;
-
-                // Detect Collisions
-                var checkList = Engine.Sprite.getSpritesWithType(["tank", "wall"]);
-                var ignoreList = [bullet.spriteOriginatedFrom];
-                var collision = Engine.Sprite.collisionCheckSelected(bullet, checkList, ignoreList);
-                if (collision) {
-                    if (collision.type == "wall") {
-                        collision.flag = -1;
-                    }
-                    Tanks.Sounds.playSound("hitTank");
-                    bullet.flag = -1;
-                }
-            };
             return bullet;
         }
     };
