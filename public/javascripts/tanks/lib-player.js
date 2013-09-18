@@ -81,10 +81,10 @@ function Player(id, imageId) {
     self.sprite.img = window.Engine.Image.get(self.imgId+"_up");
 
     self.run = function () {
-        if (Engine.Keys.pressing("up")) self.moveUp();
-        if (Engine.Keys.pressing("down")) self.moveDown();
-        if (Engine.Keys.pressing("left")) self.moveLeft();
-        if (Engine.Keys.pressing("right")) self.moveRight();
+        if (Engine.Keys.pressing("up")) self.move("up");
+        if (Engine.Keys.pressing("down")) self.move("down");
+        if (Engine.Keys.pressing("left")) self.move("left");
+        if (Engine.Keys.pressing("right")) self.move("right");
         if (Engine.Keys.pressing("shift")) self.turbo();
         if (Engine.Keys.depressing("shift")) self.noTurbo();
         if (Engine.Keys.pressing("spacebar")) self.fire();
@@ -114,45 +114,37 @@ function Player(id, imageId) {
     self.noTurbo = function () {
         self.playerSpeed = self.playerDefaultSpeed;
     };
-    self.moveLeft = function () {
-        Engine.Sprite.useImage(self.imgId+"_left", self.sprite);
-        self.sprite.xdir = -self.playerSpeed;
-        self.sprite.ydir = 0;
-        self.sprite.x -= self.playerSpeed;
-        if (Engine.Sprite.collisionCheckAll(self.sprite)) self.sprite.x += self.playerSpeed;
-
-        self.move();
-    };
-    self.moveRight = function () {
-        Engine.Sprite.useImage(self.imgId+"_right", self.sprite);
-        self.sprite.xdir = self.playerSpeed;
-        self.sprite.ydir = 0;
-        self.sprite.x += self.playerSpeed;
-        if (Engine.Sprite.collisionCheckAll(self.sprite)) self.sprite.x -= self.playerSpeed;
-
-        self.move();
-    };
-    self.moveUp = function () {
-        Engine.Sprite.useImage(self.imgId+"_up", self.sprite);
-        self.sprite.ydir = -self.playerSpeed;
-        self.sprite.xdir = 0;
-        self.sprite.y -= self.playerSpeed;
-        if (Engine.Sprite.collisionCheckAll(self.sprite)) self.sprite.y += self.playerSpeed;
-
-        self.move();
-    };
-    self.moveDown = function () {
-        Engine.Sprite.useImage(self.imgId+"_down", self.sprite);
-        self.sprite.ydir = self.playerSpeed;
-        self.sprite.xdir = 0;
-        self.sprite.y += self.playerSpeed;
-        if (Engine.Sprite.collisionCheckAll(self.sprite)) self.sprite.y -= self.playerSpeed;
-
-        self.move();
-    }
 }
-Player.prototype.move = function () {
+Player.prototype.move = function (direction) {
     var self = this;
+    Engine.Sprite.useImage(self.imgId+"_"+ direction, self.sprite);
+    xmod = 0;
+    ymod = 0;
+    switch(direction) {
+        case "up":
+            ymod = -1;
+            break;
+        case "down":
+            ymod = 1;
+            break;
+        case "left":
+            xmod = -1;
+            break;
+        case "right":
+            xmod = 1;
+            break;
+    }
+    self.sprite.ydir = ydir * self.playerSpeed;
+    self.sprite.xdir = xdir * self.playerSpeed;
+
+    if(xmod != 0) {
+        if (Engine.Sprite.collisionCheckAll(self.sprite)) self.sprite.x -= xdir * self.playerSpeed;
+        self.sprite.x += xdir * self.playerSpeed;
+    } else if (ymod != 0) {
+        self.sprite.y += ydir * self.playerSpeed;
+        if (Engine.Sprite.collisionCheckAll(self.sprite)) self.sprite.y -= ydir * self.playerSpeed;
+    }
+
     Engine.Sockets.emit("move", {
         id: self.sprite.id,
         x: self.sprite.x,

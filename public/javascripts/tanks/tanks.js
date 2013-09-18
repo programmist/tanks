@@ -56,33 +56,29 @@ Tanks = new function(){
     };
 
     self.addListeners = function(){
-        Engine.Sockets.addListener("player-enter", function(sprite){
-            opp = new Player(sprite.id, "player2");
-            opp.sprite.x = sprite.x;
-            opp.sprite.y = sprite.y;
-            self.opponents[sprite.id] = opp;
+        Engine.Sockets.addListener("player-enter", function(event){
+            opp = new Player(event.id, "player2");
+            opp.sprite.x = event.x;
+            opp.sprite.y = event.y;
+            self.opponents[event.id] = opp;
         });
 
-        Engine.Sockets.addListener("player-leave", function(sprite){
-            opp = self.opponents[sprite.id];
+        Engine.Sockets.addListener("player-leave", function(event){
+            opp = self.opponents[event.id];
             opp.destroy();
-            delete self.opponents[sprite.id];
+            delete self.opponents[event.id];
         });
 
-        Engine.Sockets.addListener("move", function(sprite){
-            var _sprite = Engine.Sprite.getByID(sprite.id);
-            _sprite.x = sprite.x;
-            _sprite.y = sprite.y;
+        Engine.Sockets.addListener("move", function(event){
+            opp = self.opponents[event.id];
+            opp.sprite.x = event.x;
+            opp.sprite.y = event.y;
+            opp.move(event.command);
         });
 
-        Engine.Sockets.addListener("fire", function(sprite){
-            var _sprite = Engine.Sprite.getByID(sprite.id);
-            /*
-             *  We need another level of abstraction.  Rather than moving sprites
-             *  we should be moving players and delegating the sprite handling to them.
-             * Otherwise we're stuck in this position where we need to tell the tank to fire,
-             * but have no reference to it.
-             */
+        Engine.Sockets.addListener("fire", function(event){
+            opp = self.opponents[event.id];
+            opp.fire();
         });
     };
   
