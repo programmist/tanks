@@ -194,6 +194,4 @@ Opponent.prototype.constructor = Opponent;
 function Opponent(id, imageId) {
     Player.call(this, id, imageId);
 }
-Opponent.prototype.run = function() {
-
-};
+Opponent.prototype.run = function() {};

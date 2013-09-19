@@ -95,6 +95,15 @@ Tanks = new function(){
             id: self.localPlayer.id,
             x: self.localPlayer.sprite.x,
             y: self.localPlayer.sprite.y
+        }, function(opponents) {
+            for(var o in opponents) {
+                if(!self.opponents[o.id]) {
+                    opp = new Player(o.id, "player2");
+                    opp.sprite.x = o.x;
+                    opp.sprite.y = o.y;
+                    self.opponents[o.id] = opp;
+                }
+            }
         });
     };
 };

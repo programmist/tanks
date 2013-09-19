@@ -1,4 +1,5 @@
 
+var _ = require('lodash');
 var express = require('express');
 var routes = require('./routes');
 var user = require('./routes/user');
@@ -23,11 +24,28 @@ server.listen(app.get('port'), function () {
     console.log('Express server listening on port ' + app.get('port'));
 });
 
+var players = [];
+
 var connectionCount = 1;
 io.sockets.on('connection', function (socket) {
     socket.emit("connId", {"id": connectionCount++});
+
+    /*
+     * location ping, so that inactive tanks are reported to new players.
+     */
+    socket.on("ping", function(data){
+        console.log("PING - tank located: " + JSON.stringify(data));
+        pl = _.find(players, { 'id': data.id });
+        pl.x = data.x;
+        pl.y = data.y;
+        socket.broadcast.emit("ping", data);
+    });
+
     socket.on("move", function(data){
         console.log("MOVE - Received from tank: " + JSON.stringify(data));
+        pl = _.find(players, { 'id': data.id });
+        pl.x = data.x;
+        pl.y = data.y;
         socket.broadcast.emit("move", data);
     });
 
@@ -36,8 +54,14 @@ io.sockets.on('connection', function (socket) {
         socket.broadcast.emit("fire",data);
     });
 
-    socket.on("player-enter", function(data){
+    socket.on("player-enter", function(data, fn){
         console.log("NEW PLAYER - Received from tank: " + JSON.stringify(data));
+        players.push({
+            id: data.id,
+            x: data.x,
+            y: data.y
+        });
+        fn(players); // send list of players and locations
         socket.broadcast.emit("player-enter",data);
     });
 
