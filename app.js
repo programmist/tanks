@@ -54,7 +54,7 @@ io.sockets.on('connection', function (socket) {
         socket.broadcast.emit("fire",data);
     });
 
-    socket.on("player-enter", function(data, fn){
+    socket.on('player-enter', function(data, fn){
         console.log("NEW PLAYER - Received from tank: " + JSON.stringify(data));
         players.push({
             id: data.id,

@@ -7,7 +7,12 @@ Engine.Sockets = new function(){
   self.addListener = function(name, callback){
     self.socket.on(name, callback);
   };
-  self.emit = function(name, data){
-    self.socket.emit(name, data);
+  self.emit = function(name, data, fn){
+      if(fn) {
+          self.socket.emit(name, data, fn);
+      } else {
+          self.socket.emit(name, data);
+      }
+
   }
 };

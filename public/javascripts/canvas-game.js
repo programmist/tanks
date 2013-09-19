@@ -1,1 +1,1 @@
-window.Tanks.init();
+//window.Tanks.init();
