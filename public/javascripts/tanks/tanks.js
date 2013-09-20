@@ -55,6 +55,15 @@ Tanks = new function(){
         Engine.Canvas.start(self.fps);
     };
 
+    self.endGame = function() {
+        opp.destroy();
+        Engine.Sockets.emit("player-leave", {
+            id: self.localPlayer.id,
+            x: self.sprite.x,
+            y: self.sprite.y
+        });
+    };
+
     self.addListeners = function(){
         Engine.Sockets.addListener("player-enter", function(event){
             if (self.connectionID == event.id) return;
@@ -67,7 +76,6 @@ Tanks = new function(){
         Engine.Sockets.addListener("player-leave", function(event){
             if (self.connectionID == event.id) return;
             opp = self.opponents[event.id];
-            opp.destroy();
             delete self.opponents[event.id];
         });
 

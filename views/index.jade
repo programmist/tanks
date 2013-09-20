@@ -6,6 +6,8 @@ block content
     h3= 'This game might bust, don\'t worry it\'s still beta'
     button(onclick="window.Tanks.init();").
         Start Game
+    button(onclick="window.Tanks.endGame();").
+        End Game
     canvas(id="tank-canvas",style="border:1px solid #000")
     script(type='text/javascript', src='javascripts/ext/html5preloader.js')
     script(type='text/javascript', src='javascripts/jquery-2.0.3.js')

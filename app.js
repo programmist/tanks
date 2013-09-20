@@ -56,13 +56,13 @@ io.sockets.on('connection', function (socket) {
 
     socket.on('player-enter', function(data, fn){
         console.log("NEW PLAYER - Received from tank: " + JSON.stringify(data));
+        fn(players); // send list of players and locations
+        socket.broadcast.emit("player-enter",data);
         players.push({
             id: data.id,
             x: data.x,
             y: data.y
         });
-        fn(players); // send list of players and locations
-        socket.broadcast.emit("player-enter",data);
     });
 
     socket.on("player-leave", function(data){
