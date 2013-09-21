@@ -220,14 +220,13 @@ Player = (function() {
 Opponent = (function(_super) {
     __extends(Opponent, _super);
 
+
     function Opponent(id, imageId) {
-        _ref = Opponent.__super__.constructor.apply(this, id, imageId);
+        _ref = Opponent.__super__.constructor.apply(this, arguments);
         return _ref;
     }
 
-    Opponent.prototype.run = function() {
-        console.log("opponent run: " + id)
-    };
+    Opponent.prototype.run = function() {};
     return Opponent;
-    
+
 })(Player);

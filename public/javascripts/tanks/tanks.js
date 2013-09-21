@@ -67,7 +67,7 @@ Tanks = new function(){
     self.addListeners = function(){
         Engine.Sockets.addListener("player-enter", function(event){
             if (self.connectionID == event.id) return;
-            opp = new Player(event.id, "player2");
+            opp = new Opponent(event.id, "player2");
             opp.sprite.x = event.x;
             opp.sprite.y = event.y;
             self.opponents[event.id] = opp;
