@@ -104,9 +104,11 @@ Tanks = new function(){
             x: self.localPlayer.sprite.x,
             y: self.localPlayer.sprite.y
         }, function(opponents) {
-            for(var o in opponents) {
+            for(var i in opponents) {
+                o = opponents[i];
+                console.log("opponent: " + o)
                 if(!self.opponents[o.id]) {
-                    opp = new Player(o.id, "player2");
+                    opp = new Opponent(o.id, "player2");
                     opp.sprite.x = o.x;
                     opp.sprite.y = o.y;
                     self.opponents[o.id] = opp;
