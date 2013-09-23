@@ -33,35 +33,36 @@ Tanks = new function(){
     self.init = function() {
 //      Engine.Sockets.connect("node-test-box-24433.use1.actionbox.io:3000");
       Engine.Sockets.connect("127.0.0.1:3000");
-      Engine.Sockets.addListener("connId", function(data){
-        self.connectionID = data.id;
         var init = $.Deferred();
-        init.then(function() { 
-          Engine.Image.preLoad(Tanks.images);
+        init.then(function() {
+            Engine.Image.preLoad(Tanks.images);
         }).then(function() {
-          Tanks.Sounds.loadSounds(Tanks.sounds);
-        }).then(function() {
-          Tanks.reset();
-          Tanks.addListeners();
+            Tanks.Sounds.loadSounds(Tanks.sounds);
+        }).then(function(){
+            self.addListeners();
         });
-        init.resolve();    
-      });
+        init.resolve();
     };
 
     // Reset Game (init canvas, start the loop)
     self.reset = function(){
-        self.createSprites();
+        Engine.Sprite.reset();
+        self.newPlayer();
         Engine.Canvas.init(self.canvasElement, self.width, self.height);
         Engine.Canvas.start(self.fps);
     };
 
     self.endGame = function() {
-        opp.destroy();
         Engine.Sockets.emit("player-leave", {
-            id: self.localPlayer.id,
-            x: self.sprite.x,
-            y: self.sprite.y
+            id: self.localPlayer.id
         });
+        self.localPlayer.destroy();
+        self.localPlayer = null;
+        for(var opp in self.opponents) {
+            self.opponents[opp].destroy();
+            delete self.opponents[opp];
+        }
+        self.opponents = [];
     };
 
     self.addListeners = function(){
@@ -76,6 +77,7 @@ Tanks = new function(){
         Engine.Sockets.addListener("player-leave", function(event){
             if (self.connectionID == event.id) return;
             opp = self.opponents[event.id];
+            opp.destroy();
             delete self.opponents[event.id];
         });
 
@@ -93,10 +95,17 @@ Tanks = new function(){
             opp.fire();
         });
     };
-  
-    // Create the sprites for this game
-    self.createSprites = function(){
-        Engine.Sprite.reset();
+
+    self.newPlayer = function() {
+        if(self.localPlayer) {
+            Engine.Sockets.emit("player-leave", {
+                id: self.localPlayer.id,
+                x: self.localPlayer.sprite.x,
+                y: self.localPlayer.sprite.y
+            });
+        }
+
+        self.connectionID = Math.round(Math.random() * 1000000000000);
         self.localPlayer = new Player(Tanks.connectionID, "player1");
 
         Engine.Sockets.emit("player-enter", {
@@ -106,7 +115,6 @@ Tanks = new function(){
         }, function(opponents) {
             for(var i in opponents) {
                 o = opponents[i];
-                console.log("opponent: " + o)
                 if(!self.opponents[o.id]) {
                     opp = new Opponent(o.id, "player2");
                     opp.sprite.x = o.x;

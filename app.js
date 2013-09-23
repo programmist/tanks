@@ -26,9 +26,7 @@ server.listen(app.get('port'), function () {
 
 var players = [];
 
-var connectionCount = 1;
 io.sockets.on('connection', function (socket) {
-    socket.emit("connId", {"id": connectionCount++});
 
     /*
      * location ping, so that inactive tanks are reported to new players.
@@ -67,6 +65,7 @@ io.sockets.on('connection', function (socket) {
 
     socket.on("player-leave", function(data){
         console.log("PLAYER " + data.id + " Leaving the game: " + JSON.stringify(data));
+        _.remove(players, function(player) { return player.id == data.id; });
         socket.broadcast.emit("player-leave",data);
     });
 });

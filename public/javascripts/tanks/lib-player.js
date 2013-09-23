@@ -32,6 +32,7 @@ Sprite = (function() {
         Engine.Sprite.collection.push(self);  // refactor (more OO)
     }
     Sprite.prototype.destroy = function() {
+        var self = this;
         Engine.Sprite.remove(self);
     };
 
@@ -176,7 +177,7 @@ Player = (function() {
             self.sprite.y += ymod * self.playerSpeed;
             if (Engine.Sprite.collisionCheckAll(self.sprite)) self.sprite.y -= ymod * self.playerSpeed;
         }
-        console.log("tank " + self.id + " move: " + direction)
+
         Engine.Sockets.emit("move", {
             id: self.sprite.id,
             x: self.sprite.x,
@@ -211,6 +212,7 @@ Player = (function() {
     };
 
     Player.prototype.destroy = function() {
+        var self = this;
         self.sprite.destroy();
     };
 
