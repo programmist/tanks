@@ -7,7 +7,7 @@ Tanks = new function(){
     self.width = 800;
     self.height = 500;
     self.fps = 60;
-    self.images = [{
+    self.images = {
         "player1_up":       "images/p1_up.gif",
         "player1_right":    "images/p1_right.gif",
         "player1_down":     "images/p1_down.gif",
@@ -19,8 +19,8 @@ Tanks = new function(){
         "player1_fire":     "images/p1_fire.gif",
         "player2_fire":     "images/p2_fire.gif",
         "wall":             "images/wall.gif"
-    }];
-    self.sounds = [{
+    };
+    self.sounds = {
         "player1shoot":     "sounds/p1_fire.mp3",
         "player2shoot":     "sounds/p2_fire.mp3",
         "hitTank":          "sounds/explosion-1.mp3",
@@ -28,7 +28,7 @@ Tanks = new function(){
         "p2tankMove":       "sounds/tankmove.mp3",
         "pongFire":         "sounds/pong-fire.mp3",
         "crash":            "sounds/crash.mp3"
-    }];
+    };
 
     self.init = function() {
 //      Engine.Sockets.connect("node-test-box-24433.use1.actionbox.io:3000");
